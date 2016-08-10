@@ -60,6 +60,9 @@ namespace PokemonGo.RocketAPI.Console
         public bool PrioritizeIVOverCP => UserSettings.Default.PrioritizeIVOverCP;
         public bool DebugMode => UserSettings.Default.DebugMode;
 
+        public bool IncubateEggs => UserSettings.Default.IncubateEggs;
+        public bool UseOnlyBasicIncubator => UserSettings.Default.UseOnlyBasicIncubator;
+
         private ICollection<PokemonId> _pokemonsToEvolve;
         private ICollection<PokemonId> _pokemonsToNotTransfer;
         private ICollection<PokemonId> _pokemonsToNotCatch;

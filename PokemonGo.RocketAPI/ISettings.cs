@@ -51,6 +51,9 @@ namespace PokemonGo.RocketAPI
         bool UseLuckyEggs { get; }
         bool DebugMode { get; }
 
+        bool IncubateEggs { get; }
+        bool UseOnlyBasicIncubator { get; }
+
         ICollection<KeyValuePair<ItemId, int>> ItemRecycleFilter(IEnumerable<ItemData> myItems);
         ICollection<PokemonId> PokemonsToEvolve { get; }
         ICollection<PokemonId> PokemonsToNotTransfer { get; }

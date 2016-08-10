@@ -66,6 +66,7 @@
     <Compile Include="Tasks\ExportPokemonToCsv.cs" />
     <Compile Include="Tasks\FarmPokestopsGPXTask.cs" />
     <Compile Include="Tasks\FarmPokestopsTask.cs" />
+    <Compile Include="Tasks\IncubateEggsTask.cs" />
     <Compile Include="Tasks\RecycleItemsTask.cs" />
     <Compile Include="Tasks\UseIncenseTask.cs" />
     <Compile Include="Tasks\UseLuckyEggTask.cs" />
