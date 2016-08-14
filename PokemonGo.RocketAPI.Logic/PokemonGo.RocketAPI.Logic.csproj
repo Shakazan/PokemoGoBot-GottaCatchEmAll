@@ -45,6 +45,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Device" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -85,13 +86,19 @@
       <Project>{A03A7BB2-4F0B-467B-84B2-9A76E6AAE6FB}</Project>
       <Name>POGOProtos</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PokemonGo.RocketAPI.Window\PokemonGo.RocketAPI.Window.csproj">
+      <Project>{51ce468c-2856-481a-be48-d795ddbad788}</Project>
+      <Name>PokemonGo.RocketAPI.Window</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PokemonGo.RocketAPI\PokemonGo.RocketAPI.csproj">
       <Project>{05d2da44-1b8e-4cf7-94ed-4d52451cd095}</Project>
       <Name>PokemonGo.RocketAPI</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

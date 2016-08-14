@@ -56,6 +56,8 @@ namespace PokemonGo.RocketAPI.Logic.Utils
                 minutes = TimeSpan.FromHours(time).Minutes;
             }
 
+            Currentlevel = stat.Level;
+
             return $"{stat.Level} (LvLUp in {hours}h {minutes}m | {stat.Experience - stat.PrevLevelXp - GetXpDiff(stat.Level)}/{stat.NextLevelXp - stat.PrevLevelXp - GetXpDiff(stat.Level)} XP)";
         }
 

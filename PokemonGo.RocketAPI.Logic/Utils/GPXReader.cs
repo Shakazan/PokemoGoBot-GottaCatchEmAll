@@ -100,6 +100,8 @@ namespace PokemonGo.RocketAPI.Logic.Utils
                     case "topografix:active_point":
                     case "topografix:map":
                         break;
+                    case "metadata":
+                        break;
                     default:
                         Logger.Write("Unhandled data in GPX file, attempting to skip.", LogLevel.Info);
                         break;

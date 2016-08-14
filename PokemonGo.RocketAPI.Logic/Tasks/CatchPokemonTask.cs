@@ -21,28 +21,37 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
             if (encounter == null) return;
             float probability = encounter.CaptureProbability?.CaptureProbability_[0];
 
+            var encounterPokemon = encounter is EncounterResponse ? encounter.WildPokemon?.PokemonData : encounter?.PokemonData;
             var catchType = encounter is EncounterResponse ? "Normal" : encounter is DiskEncounterResponse ? "Lure" : "Incense";
             var Id = encounter is EncounterResponse ? pokemon.PokemonId : encounter?.PokemonData.PokemonId;
-            var Level = PokemonInfo.GetLevel(encounter is EncounterResponse ? encounter.WildPokemon?.PokemonData : encounter?.PokemonData);
+            var Level = PokemonInfo.GetLevel(encounterPokemon);
             var Cp = encounter is EncounterResponse ? encounter.WildPokemon?.PokemonData?.Cp : encounter?.PokemonData?.Cp ?? 0;
-            var MaxCp = PokemonInfo.CalculateMaxCp(encounter is EncounterResponse ? encounter.WildPokemon?.PokemonData : encounter?.PokemonData);
-            var Iv = PokemonInfo.CalculatePokemonPerfection(encounter is EncounterResponse ? encounter.WildPokemon?.PokemonData : encounter?.PokemonData);
-            var Perfection = Math.Round(PokemonInfo.CalculatePokemonPerfection(encounter is EncounterResponse ? encounter.WildPokemon?.PokemonData : encounter?.PokemonData));
+            var MaxCp = PokemonInfo.CalculateMaxCp(encounterPokemon);
+            var Iv = PokemonInfo.CalculatePokemonPerfection(encounterPokemon);
+            var Perfection = Math.Round(PokemonInfo.CalculatePokemonPerfection(encounterPokemon));
             var Probability = Math.Round(probability * 100, 2);
             var distance = LocationUtils.CalculateDistanceInMeters(Logic._client.CurrentLatitude,
                 Logic._client.CurrentLongitude,
                 encounter is EncounterResponse || encounter is IncenseEncounterResponse ? pokemon.Latitude : currentFortData.Latitude,
                 encounter is EncounterResponse || encounter is IncenseEncounterResponse ? pokemon.Longitude : currentFortData.Longitude);
 
-            if (!float.IsNaN(probability) && probability < 0.35)
-                await
-                    UseBerry(encounter is EncounterResponse || encounter is IncenseEncounterResponse ? pokemon.EncounterId : encounterId,
-                    encounter is EncounterResponse || encounter is IncenseEncounterResponse ? pokemon.SpawnPointId : currentFortData?.Id);
-
             CatchPokemonResponse caughtPokemonResponse;
             var attemptCounter = 1;
             do
             {
+                // Do we use a berry?
+                if (!float.IsNaN(probability) && probability < 0.35
+                    &&
+                    (Perfection >= Logic._client.Settings.TransferPokemonKeepAllAboveIV
+                    || Cp >= Logic._client.Settings.TransferPokemonKeepAllAboveCP
+                    || Level >= BotStats.Currentlevel - 3)
+                    )
+                {
+                    await
+                        UseBerry(encounter is EncounterResponse || encounter is IncenseEncounterResponse ? pokemon.EncounterId : encounterId,
+                        encounter is EncounterResponse || encounter is IncenseEncounterResponse ? pokemon.SpawnPointId : currentFortData?.Id);
+                }
+
                 var pokeball = await GetBestBall(encounter, probability);
                 if (pokeball == ItemId.ItemUnknown)
                 {
@@ -93,7 +102,7 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
                         ? $"and received XP {caughtPokemonResponse.CaptureAward.Xp.Sum()}"
                         : $"";
 
-                    Logger.Write($"({catchStatus} / {catchType}) | {Id} - Lvl {Level} [CP {Cp}/{MaxCp} | IV: {Perfection.ToString("0.00")}% perfect] | Chance: {Probability} | {distance:0.##}m dist | with a {returnRealBallName(pokeball)}Ball {receivedXp}", LogLevel.Pokemon);
+                    Logger.Write($"({catchStatus} / {catchType}) | {Id} - Lvl {Level} [{ PokemonInfo.DisplayPokemonDetails(encounterPokemon, Logic._clientSettings.PrioritizeFactor)}] | Chance: {Probability} | {distance:0.##}m dist | with a {returnRealBallName(pokeball)}Ball {receivedXp}", LogLevel.Pokemon);
                 }
 
                 attemptCounter++;

@@ -49,6 +49,8 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -90,6 +92,10 @@
     <ProjectReference Include="..\PokemonGo.RocketAPI.Logic\PokemonGo.RocketAPI.Logic.csproj">
       <Project>{0739E40D-C589-4AEB-93E5-EE8CD6773C60}</Project>
       <Name>PokemonGo.RocketAPI.Logic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PokemonGo.RocketAPI.Window\PokemonGo.RocketAPI.Window.csproj">
+      <Project>{51ce468c-2856-481a-be48-d795ddbad788}</Project>
+      <Name>PokemonGo.RocketAPI.Window</Name>
     </ProjectReference>
     <ProjectReference Include="..\PokemonGo.RocketAPI\PokemonGo.RocketAPI.csproj">
       <Project>{05D2DA44-1B8E-4CF7-94ED-4D52451CD095}</Project>

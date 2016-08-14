@@ -36,8 +36,12 @@ namespace PokemonGo.RocketAPI.Logic
                 myPokemons = myPokemons.Where(p => filter.Contains(p.PokemonId));
             if (Logic._client.Settings.EvolveOnlyPokemonAboveIV)
                 myPokemons = myPokemons.Where(p => PokemonInfo.CalculatePokemonPerfection(p) >= Logic._client.Settings.EvolveOnlyPokemonAboveIVValue);
-            myPokemons = prioritizeIVoverCp ? myPokemons.OrderByDescending(PokemonInfo.CalculatePokemonPerfection) : myPokemons.OrderByDescending(p => p.Cp);
-
+            myPokemons = 
+                prioritizeIVoverCp 
+                ? myPokemons.OrderByDescending(PokemonInfo.CalculatePokemonPerfection) 
+                : myPokemons.OrderByDescending(p => p.Cp);
+            // SP: Override to order by PrioritizeFactor
+            myPokemons = myPokemons.OrderByDescending(x => PokemonInfo.CalculatePokemonRanking(x, Logic._clientSettings.PrioritizeFactor));
             var pokemons = myPokemons.ToList();
 
             var myPokemonSettings = await GetPokemonSettings();
@@ -80,6 +84,17 @@ namespace PokemonGo.RocketAPI.Logic
         {    
             IEnumerable<PokemonData> myPokemons = await GetPokemons();
             IEnumerable<ulong> keepPokemonsList = new List<ulong>();
+
+
+            // Keep best pokemon by new trash indicator (cp * (iv / 100)) and duplication amount
+            keepPokemonsList = keepPokemonsList.Union(myPokemons.GroupBy(p => p.PokemonId)
+                .SelectMany(
+                    p =>
+                        p.OrderByDescending(x => PokemonInfo.CalculatePokemonRanking(x, Logic._clientSettings.PrioritizeFactor))
+                            .ThenBy(n => n.StaminaMax)
+                            .Take(Logic._client.Settings.TransferPokemonKeepAmountHighestIV)
+                            .Select(n => n.Id)
+                            .ToList()));
 
             // Get a list of all Max CP pokemon
             keepPokemonsList = keepPokemonsList.Union(myPokemons.GroupBy(p => p.PokemonId)
@@ -188,6 +203,24 @@ namespace PokemonGo.RocketAPI.Logic
             var pokemons = myPokemon.ToList();
             return pokemons.Where(x => x.PokemonId == pokemon.PokemonId)
                 .OrderByDescending(PokemonInfo.CalculatePokemonPerfection)
+                .FirstOrDefault();
+        }
+
+        public static async Task<PokemonData> GetHighestPokemonOfTypeByRanking(PokemonData pokemon)
+        {
+            var myPokemon = await GetPokemons();
+            var pokemons = myPokemon.ToList();
+            return pokemons.Where(x => x.PokemonId == pokemon.PokemonId)
+                .OrderByDescending(x => PokemonInfo.CalculatePokemonRanking(x, Logic._clientSettings.PrioritizeFactor))
+                .FirstOrDefault();
+        }
+
+        public static async Task<PokemonData> GetBestPokemonOfType(PokemonData pokemon)
+        {
+            var myPokemon = await GetPokemons();
+            var pokemons = myPokemon.ToList();
+            return pokemons.Where(x => x.PokemonId == pokemon.PokemonId)
+                .OrderByDescending(x => PokemonInfo.CalculatePokemonRanking(x, Logic._clientSettings.PrioritizeFactor))
                 .FirstOrDefault();
         }
 

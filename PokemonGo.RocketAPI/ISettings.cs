@@ -54,6 +54,8 @@ namespace PokemonGo.RocketAPI
         int ExportPokemonToCsvEveryMinutes { get; }
         bool DebugMode { get; }
 
+        float PrioritizeFactor { get;  }
+
         ICollection<KeyValuePair<ItemId, int>> ItemRecycleFilter(IEnumerable<ItemData> myItems);
         ICollection<PokemonId> PokemonsToEvolve { get; }
         ICollection<PokemonId> PokemonsToNotTransfer { get; }

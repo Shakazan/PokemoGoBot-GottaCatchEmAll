@@ -1,5 +1,6 @@
 ﻿#region
 
+using PokemonGo.RocketAPI.Window;
 using System;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
@@ -18,13 +19,13 @@ namespace PokemonGo.RocketAPI.Logic.Logging
     {
         private static string _currentFile = string.Empty;
         private static readonly string Path = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Logs");
-
         //private static Logger _logger;
+        private static StatusWindow _statusForm;
 
         /// <summary>
         /// Set the logger. All future requests to <see cref="Write(string,LogLevel,ConsoleColor)"/> will use that logger, any old will be unset.
         /// </summary>
-        public static void SetLogger()
+        public static void SetLogger(StatusWindow statusForm)
         {
             if (!Directory.Exists(Path))
             {
@@ -32,6 +33,7 @@ namespace PokemonGo.RocketAPI.Logic.Logging
             }
             _currentFile = DateTime.Now.ToString("yyyy-MM-dd - HH.mm.ss");
             Log($"Initializing Rocket logger @ {DateTime.Now}...");
+            _statusForm = statusForm;
         }
 
         /// <summary>
@@ -43,6 +45,8 @@ namespace PokemonGo.RocketAPI.Logic.Logging
         public static void Write(string message, LogLevel level = LogLevel.None, ConsoleColor color = ConsoleColor.White)
         {
             Console.OutputEncoding = Encoding.Unicode;
+
+            _statusForm.LabelStatusValue = message;
 
             var dateFormat = DateTime.Now.ToString("HH:mm:ss");
             if (Logic._client != null && Logic._client.Settings.DebugMode)

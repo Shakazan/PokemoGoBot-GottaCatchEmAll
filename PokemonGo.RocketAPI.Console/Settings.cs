@@ -62,7 +62,8 @@ namespace PokemonGo.RocketAPI.Console
         public bool PrioritizeIVOverCP => UserSettings.Default.PrioritizeIVOverCP;
         public int ExportPokemonToCsvEveryMinutes => UserSettings.Default.ExportPokemonToCsvEveryMinutes;
         public bool DebugMode => UserSettings.Default.DebugMode;
-
+        public float PrioritizeFactor => UserSettings.Default.PrioritizeFactor;
+        
         private ICollection<PokemonId> _pokemonsToEvolve;
         private ICollection<PokemonId> _pokemonsToNotTransfer;
         private ICollection<PokemonId> _pokemonsToNotCatch;
@@ -75,8 +76,8 @@ namespace PokemonGo.RocketAPI.Console
         //TODO: make these configurable settings
         // Set our maximum value for all items in this group
         private const int MaxBalls = 200;
-        private const int MaxBerries = 20;
-        private const int MaxPotions = 50;
+        private const int MaxBerries = 50;
+        private const int MaxPotions = 20;
 
         public Settings()
         {

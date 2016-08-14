@@ -58,6 +58,7 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
                         myExport["Name"] = pokemon.PokemonId;
                         myExport["NickName"] = pokemon.Nickname;
                         myExport["Level"] = PokemonInfo.GetLevel(pokemon).ToString("0.0");
+                        myExport["Ranking"] = PokemonInfo.CalculatePokemonRanking(pokemon, Logic._clientSettings.PrioritizeFactor);
                         myExport["CP"] = pokemon.Cp;
                         myExport["MaxCP"] = PokemonInfo.CalculateMaxCp(pokemon);
                         myExport["IV Perfection in %"] = PokemonInfo.CalculatePokemonPerfection(pokemon).ToString("0.00");

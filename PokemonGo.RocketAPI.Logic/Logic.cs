@@ -22,6 +22,7 @@ using POGOProtos.Map.Pokemon;
 using POGOProtos.Networking.Responses;
 using Logger = PokemonGo.RocketAPI.Logic.Logging.Logger;
 using LogLevel = PokemonGo.RocketAPI.Logic.Logging.LogLevel;
+using PokemonGo.RocketAPI.Window;
 
 #endregion
 
@@ -36,12 +37,13 @@ namespace PokemonGo.RocketAPI.Logic
         public static BotStats _stats;
         public static Navigation _navigation;
         private GetPlayerResponse _playerProfile;
+        private StatusWindow _statusform;
 
         public readonly string ConfigsPath = Path.Combine(Directory.GetCurrentDirectory(), "Settings");
 
         private bool _isInitialized = false;
 
-        public Logic(ISettings clientSettings)
+        public Logic(ISettings clientSettings, StatusWindow statusForm)
         {
             _clientSettings = clientSettings;
             PositionCheckState.Execute();
@@ -49,6 +51,7 @@ namespace PokemonGo.RocketAPI.Logic
             _inventory = new Inventory();
             _stats = new BotStats();
             _navigation = new Navigation();
+            _statusform = statusForm;
         }
 
         public async Task Execute()

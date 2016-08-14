@@ -26,6 +26,19 @@ namespace PokemonGo.RocketAPI
 
     public static class PokemonInfo
     {
+        public static string DisplayPokemonDetails(PokemonData pokemon, float prioritizeFactor = 1)
+        {
+            string info = $"Ranking: {PokemonInfo.CalculatePokemonRanking(pokemon, prioritizeFactor).ToString("0.00")}, CP: {pokemon.Cp}/{PokemonInfo.CalculateMaxCp(pokemon)} IV:{ PokemonInfo.CalculatePokemonPerfection(pokemon).ToString("0.00")}% ";
+            return info;
+        }
+        // new rank indicator for pokemon comparison, which will include cp and iv
+        // factor of 1 will consider iv and cp equally - greater than 1 will weight cp more
+        // factor of 0 will consider only iv
+        public static double CalculatePokemonRanking(PokemonData poke, float prioritizeFactor)
+        {
+            return Math.Pow(poke.Cp, prioritizeFactor) * (CalculatePokemonPerfection(poke) / 100);
+        }
+
         public static double CalculatePokemonPerfection(PokemonData poke)
         {
             if (Math.Abs(poke.CpMultiplier + poke.AdditionalCpMultiplier) <= 0)

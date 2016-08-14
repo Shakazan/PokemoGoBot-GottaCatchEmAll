@@ -25,10 +25,12 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
             {
                 var evolvePokemonOutProto = await Logic._client.Inventory.EvolvePokemon(pokemon.Id);
 
+                var pokemonDetails = PokemonInfo.DisplayPokemonDetails(pokemon, Logic._clientSettings.PrioritizeFactor) ;
+
                 await Inventory.GetCachedInventory(true);
 
                 Logger.Write(evolvePokemonOutProto.Result == EvolvePokemonResponse.Types.Result.Success
-                        ? $"{pokemon.PokemonId} successfully for {evolvePokemonOutProto.ExperienceAwarded} xp"
+                        ? $"{pokemon.PokemonId} {pokemonDetails} successfully for {evolvePokemonOutProto.ExperienceAwarded} xp"
                         : $"Failed: {pokemon.PokemonId}. EvolvePokemonOutProto.Result was {evolvePokemonOutProto.Result}, stopping evolving {pokemon.PokemonId}"
                     , LogLevel.Evolve);
 
