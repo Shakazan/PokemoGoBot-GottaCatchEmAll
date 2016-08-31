@@ -117,7 +117,6 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
 
                             async () =>
                             {
-                                //await CatchNearbyPokemonsTask.Execute(session, cancellationToken);
                                 // Catch normal map Pokemon
                                 await CatchMapPokemonsTask.Execute();
                                 //Catch Pokestops on the Way
