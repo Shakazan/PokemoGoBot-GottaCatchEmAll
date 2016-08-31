@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{1FEA147E-F704-497B-A538-00B053B5F672}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PokemonGo.RocketAPI.Console</RootNamespace>
     <AssemblyName>PokemonGo.RocketAPI.Console</AssemblyName>
@@ -37,7 +37,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GMap.NET.Core">
+      <HintPath>..\GMap\GMap.NET.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="GMap.NET.WindowsForms">
+      <HintPath>..\GMap\GMap.NET.WindowsForms.dll</HintPath>
+    </Reference>
     <Reference Include="Google.Protobuf, Version=3.0.0.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Protobuf.3.0.0-beta4\lib\net45\Google.Protobuf.dll</HintPath>
       <Private>True</Private>
@@ -59,6 +68,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Map.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Map.Designer.cs">
+      <DependentUpon>Map.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MyPokemons.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MyPokemons.Designer.cs">
+      <DependentUpon>MyPokemons.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -66,7 +87,17 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="PropertyComparer.cs" />
+    <Compile Include="RichTextBoxExtensions.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="SortableBindingList.cs" />
+    <Compile Include="StatusWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StatusWindow.Designer.cs">
+      <DependentUpon>StatusWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ThreadSleep.cs" />
     <Compile Include="UserSettings.cs" />
     <Compile Include="UserSettings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -79,6 +110,8 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\MyPokemons.datasource" />
+    <None Include="Properties\DataSources\PokemonGo.RocketAPI.Logic.Inventory.datasource" />
     <None Include="UserSettings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>UserSettings.Designer.cs</LastGenOutput>
@@ -93,20 +126,25 @@
       <Project>{0739E40D-C589-4AEB-93E5-EE8CD6773C60}</Project>
       <Name>PokemonGo.RocketAPI.Logic</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PokemonGo.RocketAPI.Window\PokemonGo.RocketAPI.Window.csproj">
-      <Project>{51ce468c-2856-481a-be48-d795ddbad788}</Project>
-      <Name>PokemonGo.RocketAPI.Window</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PokemonGo.RocketAPI\PokemonGo.RocketAPI.csproj">
       <Project>{05D2DA44-1B8E-4CF7-94ED-4D52451CD095}</Project>
       <Name>PokemonGo.RocketAPI</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Map.resx">
+      <DependentUpon>Map.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MyPokemons.resx">
+      <DependentUpon>MyPokemons.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatusWindow.resx">
+      <DependentUpon>StatusWindow.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

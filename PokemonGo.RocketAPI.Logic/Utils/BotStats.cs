@@ -7,6 +7,7 @@ using PokemonGo.RocketAPI.Enums;
 using System.Globalization;
 using PokemonGo.RocketAPI.Helpers;
 using POGOProtos.Networking.Responses;
+using POGOProtos.Inventory.Item;
 
 #endregion
 
@@ -25,6 +26,7 @@ namespace PokemonGo.RocketAPI.Logic.Utils
         public static int PokemonCaughtThisSession;
         public static int PokemonTransferedThisSession;
 
+        public static int TotalBerries;
         public static int TotalStardust;
         public static int TotalPokesInBag;
 
@@ -39,6 +41,21 @@ namespace PokemonGo.RocketAPI.Logic.Utils
 
         public static string GetCurrentInfo()
         {
+
+            var items = Inventory.GetItems().Result;
+            var berries = items.Where(i => ((ItemId)i.ItemId == ItemId.ItemRazzBerry
+                                        || (ItemId)i.ItemId == ItemId.ItemBlukBerry
+                                        || (ItemId)i.ItemId == ItemId.ItemNanabBerry
+                                        || (ItemId)i.ItemId == ItemId.ItemWeparBerry
+                                        || (ItemId)i.ItemId == ItemId.ItemPinapBerry) && i.Count > 0).GroupBy(i => ((ItemId)i.ItemId)).ToList();
+
+            TotalBerries = 0;
+
+            foreach (var berry in berries)
+            {
+                TotalBerries += berry.Sum(item => item.Count);
+            }
+
             var stats = Inventory.GetPlayerStats().Result;
             var output = string.Empty;
             var stat = stats.FirstOrDefault();
@@ -90,9 +107,9 @@ namespace PokemonGo.RocketAPI.Logic.Utils
             TotalPokesInPokedex = PokeDex.Count();
         }
 
-        public static async Task UpdateConsoleTitle()
+        public static string ConsoleTitle()
         {
-            Console.Title = string.Format(
+            return string.Format(
                 "{0} - Runtime {1} - Lvl: {2:0} | EXP/H: {3:0} | P/H: {4:0} | Stardust: {5:0} | Transfered: {6:0} | Items Recycled: {7:0} | Pokemon: {8:0} | Pokedex: [Captured: {9:0} - Saw: {10:0}] | Km Walked this Session: {11:0.00} | Bot Version: {12:0}",
                 _playerName, FormatRuntime(), GetCurrentInfo(), ExperienceThisSession / GetRuntime(),
                 PokemonCaughtThisSession / GetRuntime(), TotalStardust, PokemonTransferedThisSession, ItemsRemovedThisSession, TotalPokesInBag, TotalPokesInPokedexCaptured, TotalPokesInPokedex, KmWalkedCurrent, GitChecker.CurrentVersion);

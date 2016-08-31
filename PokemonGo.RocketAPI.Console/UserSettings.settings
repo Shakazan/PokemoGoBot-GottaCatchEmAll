@@ -3,10 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="TransferPokemonKeepAllAboveIV" Type="System.Single" Scope="User">
-      <Value Profile="(Default)">95</Value>
-    </Setting>
-    <Setting Name="WalkingSpeedInKilometerPerHour" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">10</Value>
+      <Value Profile="(Default)">90</Value>
     </Setting>
     <Setting Name="UsePokemonToNotCatchList" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -18,16 +15,16 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="GPXFile" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Users\sparsloe\Downloads\Southfields To Westminster.gpx</Value>
+      <Value Profile="(Default)">C:\Users\sparsloe\Downloads\GreenPark2b.gpx</Value>
     </Setting>
     <Setting Name="NotTransferPokemonsThatCanEvolve" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="EvolveOnlyPokemonAboveIV" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="EvolvePokemon" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="TransferPokemon" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -81,25 +78,25 @@
       <Value Profile="(Default)">32</Value>
     </Setting>
     <Setting Name="TransferPokemonKeepAllAboveCP" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">1800</Value>
+      <Value Profile="(Default)">1500</Value>
     </Setting>
     <Setting Name="DefaultLatitude" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">51.51562</Value>
+      <Value Profile="(Default)">51.504836</Value>
     </Setting>
     <Setting Name="DefaultLongitude" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">-0.117373</Value>
+      <Value Profile="(Default)">-0.142159</Value>
     </Setting>
     <Setting Name="AuthType" Type="System.String" Scope="User">
       <Value Profile="(Default)">Google</Value>
     </Setting>
     <Setting Name="PtcUsername" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Tahkalak</Value>
+      <Value Profile="(Default)">Takalak01</Value>
     </Setting>
     <Setting Name="PtcPassword" Type="System.String" Scope="User">
       <Value Profile="(Default)">Alright.1</Value>
     </Setting>
     <Setting Name="MaxTravelDistanceInMeters" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">1500</Value>
+      <Value Profile="(Default)">500</Value>
     </Setting>
     <Setting Name="UseLuckyEggs" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -108,10 +105,10 @@
       <Value Profile="(Default)">90</Value>
     </Setting>
     <Setting Name="GoogleEmail" Type="System.String" Scope="User">
-      <Value Profile="(Default)">shaunparsloe@gmail.com</Value>
+      <Value Profile="(Default)">karenandshaun2014@gmail.com</Value>
     </Setting>
     <Setting Name="GooglePassword" Type="System.String" Scope="User">
-      <Value Profile="(Default)">rkhfxtklvtomxeub</Value>
+      <Value Profile="(Default)">mambo001</Value>
     </Setting>
     <Setting Name="TransferPokemonKeepAmountHighestCP" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>

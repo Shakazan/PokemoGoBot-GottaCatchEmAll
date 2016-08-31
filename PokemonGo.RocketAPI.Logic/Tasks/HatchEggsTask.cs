@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using PokemonGo.RocketAPI.Logic.Logging;
 using POGOProtos.Data;
 using POGOProtos.Inventory.Item;
+using System.Threading;
 
 namespace PokemonGo.RocketAPI.Logic.Tasks
 {
@@ -55,6 +56,8 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
 
                         var response = await Logic._client.Inventory.UseItemEggIncubator(incubator.Id, egg.Id);
                         Logger.Write($"Adding Egg #{unusedEggs.IndexOf(egg)} with {egg.EggKmWalkedTarget}km to Incubator #{incubators.IndexOf(incubator)}: {response.Result}!", LogLevel.Incubation);
+
+                        Thread.Sleep(5000);
 
                         unusedEggs.Remove(egg);
                     }

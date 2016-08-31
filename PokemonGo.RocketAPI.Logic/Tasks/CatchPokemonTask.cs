@@ -10,6 +10,7 @@ using POGOProtos.Networking.Responses;
 using POGOProtos.Map.Fort;
 using Logger = PokemonGo.RocketAPI.Logic.Logging.Logger;
 using LogLevel = PokemonGo.RocketAPI.Logic.Logging.LogLevel;
+using System.Threading;
 
 namespace PokemonGo.RocketAPI.Logic.Tasks
 {
@@ -34,22 +35,57 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
                 Logic._client.CurrentLongitude,
                 encounter is EncounterResponse || encounter is IncenseEncounterResponse ? pokemon.Latitude : currentFortData.Latitude,
                 encounter is EncounterResponse || encounter is IncenseEncounterResponse ? pokemon.Longitude : currentFortData.Longitude);
+            double reticleSize = Convert.ToDouble(new Random().Next(175, 195)) / 100D;
+            var isSpinning = new Random().Next(0, 1);
+            var hitPos = 1;
+            string lineEnding = "\n";
 
             CatchPokemonResponse caughtPokemonResponse;
+
             var attemptCounter = 1;
             do
             {
+                bool useBerry = false;
+
                 // Do we use a berry?
+                // Low probability and either:
+                // High CP, or High IV pokemon
                 if (!float.IsNaN(probability) && probability < 0.35
                     &&
-                    (Perfection >= Logic._client.Settings.TransferPokemonKeepAllAboveIV
-                    || Cp >= Logic._client.Settings.TransferPokemonKeepAllAboveCP
-                    || Level >= BotStats.Currentlevel - 3)
+                        (
+                            (Level >= BotStats.Currentlevel - 3
+                            || Perfection >= Logic._client.Settings.TransferPokemonKeepAllAboveIV
+                            || Cp >= Logic._client.Settings.TransferPokemonKeepAllAboveCP)
+                        )
                     )
+                {
+                    useBerry = true;
+                }
+
+                // Use a berry if low probability and lots of berries
+                if (BotStats.TotalBerries > (Logic._client.Settings.MaxBerries * 0.9))
+                {
+                    if (!float.IsNaN(probability) && probability < 0.35)
+                    {
+                        useBerry = true;
+                    }
+                }
+
+                if (useBerry)
                 {
                     await
                         UseBerry(encounter is EncounterResponse || encounter is IncenseEncounterResponse ? pokemon.EncounterId : encounterId,
                         encounter is EncounterResponse || encounter is IncenseEncounterResponse ? pokemon.SpawnPointId : currentFortData?.Id);
+                }
+
+                if (Perfection >= Logic._client.Settings.TransferPokemonKeepAllAboveIV
+                 || Cp >= Logic._client.Settings.TransferPokemonKeepAllAboveCP
+                 || attemptCounter >= 3)
+                {
+                    // Get a perfect throw
+                    reticleSize = 1.9 + (new Random().Next(20, 99) / 1000);
+                    isSpinning = 1;
+                    hitPos = 1;
                 }
 
                 var pokeball = await GetBestBall(encounter, probability);
@@ -62,7 +98,20 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
                 caughtPokemonResponse =
                     await Logic._client.Encounter.CatchPokemon(
                         encounter is EncounterResponse || encounter is IncenseEncounterResponse ? pokemon.EncounterId : encounterId,
-                        encounter is EncounterResponse || encounter is IncenseEncounterResponse ? pokemon.SpawnPointId : currentFortData.Id, pokeball);
+                        encounter is EncounterResponse || encounter is IncenseEncounterResponse ? pokemon.SpawnPointId : currentFortData.Id, 
+                        pokeball,
+                        reticleSize,
+                        isSpinning,
+                        hitPos);
+
+                if (caughtPokemonResponse.Status == CatchPokemonResponse.Types.CatchStatus.CatchEscape)
+                {
+                    lineEnding = "";
+                }
+                else
+                {
+                    lineEnding = "\n";
+                }
 
                 if (caughtPokemonResponse.Status == CatchPokemonResponse.Types.CatchStatus.CatchSuccess)
                 {
@@ -72,9 +121,9 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
                     await BotStats.GetPokemonCount();
                     var profile = await Logic._client.Player.GetPlayer();
                     BotStats.TotalStardust = profile.PlayerData.Currencies.ToArray()[1].Amount;
-                    BotStats.UpdateConsoleTitle();
+                    
                 }
-                
+
                 if (encounter?.CaptureProbability?.CaptureProbability_ != null)
                 {
                     Func<ItemId, string> returnRealBallName = a =>
@@ -102,9 +151,12 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
                         ? $"and received XP {caughtPokemonResponse.CaptureAward.Xp.Sum()}"
                         : $"";
 
-                    Logger.Write($"({catchStatus} / {catchType}) | {Id} - Lvl {Level} [{ PokemonInfo.DisplayPokemonDetails(encounterPokemon, Logic._clientSettings.PrioritizeFactor)}] | Chance: {Probability} | {distance:0.##}m dist | with a {returnRealBallName(pokeball)}Ball {receivedXp}", LogLevel.Pokemon);
+                    Logger.Write($"({catchStatus} / {catchType}) | {Id} - Lvl {Level} [{ PokemonInfo.DisplayPokemonDetails(encounterPokemon, Logic._clientSettings.PrioritizeFactor)}] | Chance: {Probability} | {distance:0.##}m dist | with a {returnRealBallName(pokeball)}Ball {receivedXp}{lineEnding}", LogLevel.Pokemon);
                 }
 
+                // Takes about 15 seconds to catch a pokemon
+                // Thread.Sleep(15000);
+                ThreadSleep.f_sleep(15);
                 attemptCounter++;
             }
             while (caughtPokemonResponse.Status == CatchPokemonResponse.Types.CatchStatus.CatchMissed || caughtPokemonResponse.Status == CatchPokemonResponse.Types.CatchStatus.CatchEscape);
@@ -148,6 +200,7 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
             await Logic._client.Encounter.UseCaptureItem(encounterId, ItemId.ItemRazzBerry, spawnPointId);
             berry.Count -= 1;
             Logger.Write($"Used Razz Berry, remaining: {berry.Count}", LogLevel.Berry);
+            ThreadSleep.f_sleep(4);
         }
 
         public static async Task<ItemId> GetBestBerry(dynamic encounter, float probability)

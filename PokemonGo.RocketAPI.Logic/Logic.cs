@@ -22,7 +22,6 @@ using POGOProtos.Map.Pokemon;
 using POGOProtos.Networking.Responses;
 using Logger = PokemonGo.RocketAPI.Logic.Logging.Logger;
 using LogLevel = PokemonGo.RocketAPI.Logic.Logging.LogLevel;
-using PokemonGo.RocketAPI.Window;
 
 #endregion
 
@@ -37,13 +36,15 @@ namespace PokemonGo.RocketAPI.Logic
         public static BotStats _stats;
         public static Navigation _navigation;
         private GetPlayerResponse _playerProfile;
-        private StatusWindow _statusform;
+        private static int startTrack = 0;
+        private static int startSegment = 0;
+        private static int startPoint = 0;
 
         public readonly string ConfigsPath = Path.Combine(Directory.GetCurrentDirectory(), "Settings");
 
         private bool _isInitialized = false;
 
-        public Logic(ISettings clientSettings, StatusWindow statusForm)
+        public Logic(ISettings clientSettings)
         {
             _clientSettings = clientSettings;
             PositionCheckState.Execute();
@@ -51,7 +52,6 @@ namespace PokemonGo.RocketAPI.Logic
             _inventory = new Inventory();
             _stats = new BotStats();
             _navigation = new Navigation();
-            _statusform = statusForm;
         }
 
         public async Task Execute()
@@ -174,8 +174,7 @@ namespace PokemonGo.RocketAPI.Logic
                 {
                     await Inventory.GetCachedInventory();
                     _playerProfile = await _client.Player.GetPlayer();
-                    BotStats.UpdateConsoleTitle();
-
+                   
                     var stats = await Inventory.GetPlayerStats();
                     var stat = stats.FirstOrDefault();
                     if (stat != null) BotStats.KmWalkedOnStart = stat.KmWalked;
@@ -201,8 +200,20 @@ namespace PokemonGo.RocketAPI.Logic
 
                     await RecycleItemsTask.Execute();
                     if (_client.Settings.UseLuckyEggs) await UseLuckyEggTask.Execute();
-                    if (_client.Settings.EvolvePokemon || _client.Settings.EvolveOnlyPokemonAboveIV) await EvolvePokemonTask.Execute();
-                    if (_client.Settings.TransferPokemon) await TransferPokemonTask.Execute();
+                    Logger.UpdateTitle(BotStats.GetCurrentInfo());
+                    await BotStats.GetPokemonCount();
+                    if (BotStats.TotalPokesInBag >= 235)
+                    {
+
+                        if (_client.Settings.EvolvePokemon || _client.Settings.EvolveOnlyPokemonAboveIV)
+                        {
+                            await Inventory.GetCachedInventory(true);
+                            var pokemonToEvolve = await Inventory.GetPokemonToEvolve(Logic._client.Settings.PrioritizeIVOverCP, Logic._client.Settings.PokemonsToEvolve);
+
+                            await EvolvePokemonTask.Execute(pokemonToEvolve);
+                        }
+                        if (_client.Settings.TransferPokemon) await TransferPokemonTask.Execute();
+                    }
                     await ExportPokemonToCsv.Execute(_playerProfile.PlayerData);
                     if (_clientSettings.HatchEggs) await HatchEggsTask.Execute();
                 }
@@ -226,10 +237,24 @@ namespace PokemonGo.RocketAPI.Logic
 
         private async Task Main()
         {
+
             if (_clientSettings.UseGPXPathing)
-                await FarmPokestopsGPXTask.Execute();
+            {
+                try
+                {
+                    GPXSegmentLocator GPXLocation = FarmPokestopsGPXTask.SegmentLocator;
+                    await FarmPokestopsGPXTask.Execute(GPXLocation);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Exception thrown during FarmPokestopsGPXTask", ex);
+                }
+            }
             else
+            {
                 await FarmPokestopsTask.Execute();
+            }
+
         }
 
         private async Task DisplayHighests()

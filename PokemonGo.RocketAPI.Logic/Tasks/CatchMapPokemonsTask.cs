@@ -41,8 +41,18 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
                     Logger.Write($"Encounter problem: {encounter.Status}", LogLevel.Warning);
             }
 
-            if (Logic._client.Settings.EvolvePokemon || Logic._client.Settings.EvolveOnlyPokemonAboveIV) await EvolvePokemonTask.Execute();
-            if (Logic._client.Settings.TransferPokemon) await TransferPokemonTask.Execute();
+            await BotStats.GetPokemonCount();
+            if (BotStats.TotalPokesInBag >= 235)
+            {
+                if (Logic._client.Settings.EvolvePokemon || Logic._client.Settings.EvolveOnlyPokemonAboveIV)
+                {
+                    await Inventory.GetCachedInventory(true);
+                    var pokemonToEvolve = await Inventory.GetPokemonToEvolve(Logic._client.Settings.PrioritizeIVOverCP, Logic._client.Settings.PokemonsToEvolve);
+
+                    await EvolvePokemonTask.Execute(pokemonToEvolve);
+                }
+                if (Logic._client.Settings.TransferPokemon) await TransferPokemonTask.Execute();
+            }
         }
 
         private static async Task<List<MapPokemon>> GetNearbyPokemons()

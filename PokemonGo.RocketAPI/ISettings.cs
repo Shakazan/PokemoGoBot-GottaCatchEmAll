@@ -23,7 +23,6 @@ namespace PokemonGo.RocketAPI
         bool UseGPXPathing { get; }
         string GPXFile { get; }
         bool GPXIgnorePokestops { get; }
-        double WalkingSpeedInKilometerPerHour { get; }
         int MaxTravelDistanceInMeters { get; }
         bool UseTeleportInsteadOfWalking { get; }
 
@@ -46,6 +45,10 @@ namespace PokemonGo.RocketAPI
         float TransferPokemonKeepAllAboveIV { get; }
         int TransferPokemonKeepAmountHighestCP { get; }
         int TransferPokemonKeepAmountHighestIV { get; }
+
+        int MaxBalls { get; }
+        int MaxBerries { get; }
+        int MaxPotions { get; }
 
         bool HatchEggs { get; }
         bool UseOnlyBasicIncubator { get; }

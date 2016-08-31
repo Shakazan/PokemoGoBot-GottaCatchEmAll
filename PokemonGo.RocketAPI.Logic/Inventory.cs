@@ -17,6 +17,7 @@ using POGOProtos.Inventory.Item;
 using POGOProtos.Map.Fort;
 using POGOProtos.Networking.Responses;
 using POGOProtos.Settings.Master;
+using PokemonGo.RocketAPI.Logic.Logging;
 
 #endregion
 
@@ -145,8 +146,8 @@ namespace PokemonGo.RocketAPI.Logic
                     }
 
                     keepEvolveList.AddRange(myPokemons.Where(x => x.PokemonId == pokemon.Key)
-                        .OrderByDescending(
-                            x => (prioritizeIVoverCp) ? PokemonInfo.CalculatePokemonPerfection(x) : x.Cp)
+                        .OrderByDescending(x => PokemonInfo.CalculatePokemonRanking(x, Logic._clientSettings.PrioritizeFactor))
+                        .ThenBy(x => (prioritizeIVoverCp) ? PokemonInfo.CalculatePokemonPerfection(x) : x.Cp)
                         .ThenBy(n => n.StaminaMax)
                         .Take(amountToSkip)
                         .Select(n => n.Id)
@@ -377,10 +378,17 @@ namespace PokemonGo.RocketAPI.Logic
                     p.Latitude, p.Longitude) < Logic._client.Settings.MaxTravelDistanceInMeters ||
                                                  Logic._client.Settings.MaxTravelDistanceInMeters == 0).ToList();
 
-            return pokeStops.OrderBy(
+            var forts = pokeStops.OrderBy(
                 i =>
                     LocationUtils.CalculateDistanceInMeters(Logic._client.CurrentLatitude,
                         Logic._client.CurrentLongitude, i.Latitude, i.Longitude)).ToList();
+
+            // Throw the event out.
+            if (forts.Count > 0)
+            {
+                Logger.Events.RaiseFortsChangedEvent(forts);
+            }
+            return forts;
         }
 
     }

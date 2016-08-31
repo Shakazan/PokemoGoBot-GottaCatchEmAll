@@ -65,12 +65,13 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
                 if (pokestopwithcooldown != null)
                     pokestops.Remove(pokestopwithcooldown);
 
+                int randomTopSelector = new Random().Next(1, 3);
                 var pokestop =
                     pokestops.Where(p => p.CooldownCompleteTimestampMs < DateTime.UtcNow.ToUnixTime())
                         .OrderBy(
                             i =>
                                 LocationUtils.CalculateDistanceInMeters(Logic._client.CurrentLatitude,
-                                    Logic._client.CurrentLongitude, i.Latitude, i.Longitude)).First();
+                                    Logic._client.CurrentLongitude, i.Latitude, i.Longitude)).Skip(randomTopSelector - 1).First();
                 pokestops.Remove(pokestop);
 
                 var distance = LocationUtils.CalculateDistanceInMeters(Logic._client.CurrentLatitude, Logic._client.CurrentLongitude, pokestop.Latitude, pokestop.Longitude);
@@ -96,16 +97,31 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
                     await
                         Logic._client.Player.UpdatePlayerLocation(pokestop.Latitude, pokestop.Longitude,
                             Logic._client.Settings.DefaultAltitude);
+                    // Throw the event out.
+                    Logger.Events.RaisePlayerPositionChangedEvent(new GMap.NET.PointLatLng(pokestop.Latitude, pokestop.Longitude));
+
                     Logger.Write($"Using Teleport instead of Walking!", LogLevel.Navigation);
                 }
                 else
                 {
                     await
                         Navigation.HumanLikeWalking(new GeoUtils(pokestop.Latitude, pokestop.Longitude),
+                            //async () =>
+                            //{
+                            //    // Catch normal map Pokemon
+                            //    await CatchMapPokemonsTask.Execute();
+                            //    //Catch Incense Pokemon
+                            //    await CatchIncensePokemonsTask.Execute();
+                            //    return true;
+                            //});
+
                             async () =>
                             {
+                                //await CatchNearbyPokemonsTask.Execute(session, cancellationToken);
                                 // Catch normal map Pokemon
                                 await CatchMapPokemonsTask.Execute();
+                                //Catch Pokestops on the Way
+                                await UseNearbyPokestopsTask.Execute(pokestops);
                                 //Catch Incense Pokemon
                                 await CatchIncensePokemonsTask.Execute();
                                 return true;
@@ -151,13 +167,21 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
                     else if (fortSearch.ExperienceAwarded != 0)
                     {
                         BotStats.ExperienceThisSession += fortSearch.ExperienceAwarded;
-                        BotStats.UpdateConsoleTitle();
+                        Logger.UpdateTitle(BotStats.ConsoleTitle());
                         Logger.Write($"XP: {fortSearch.ExperienceAwarded}, Gems: {fortSearch.GemsAwarded}, Items: {StringUtils.GetSummedFriendlyNameOfItemAwardList(fortSearch.ItemsAwarded)}", LogLevel.Pokestop);
                         RecycleItemsTask._recycleCounter++;
                         HatchEggsTask._hatchUpdateDelay++;
                         break; //Continue with program as loot was succesfull.
                     }
                 } while (fortTry < retryNumber - zeroCheck); //Stop trying if softban is cleaned earlier or if 40 times fort looting failed.
+
+
+                // Throw the event out.
+                List<FortData> forts = new List<FortData>();
+                pokestop.CooldownCompleteTimestampMs = DateTime.UtcNow.AddMinutes(15).ToUnixTime();
+                forts.Add(pokestop);
+                Logger.Events.RaiseFortsChangedEvent(forts);
+
 
                 if (RecycleItemsTask._recycleCounter >= 5)
                     await RecycleItemsTask.Execute();

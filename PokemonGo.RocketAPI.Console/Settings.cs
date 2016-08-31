@@ -30,8 +30,6 @@ namespace PokemonGo.RocketAPI.Console
         public bool UseGPXPathing => UserSettings.Default.UseGPXPathing;
         public string GPXFile => UserSettings.Default.GPXFile;
         public bool GPXIgnorePokestops => UserSettings.Default.GPXIgnorePokestops;
-
-        public double WalkingSpeedInKilometerPerHour => UserSettings.Default.WalkingSpeedInKilometerPerHour;
         public int MaxTravelDistanceInMeters => UserSettings.Default.MaxTravelDistanceInMeters;
         public bool UseTeleportInsteadOfWalking => UserSettings.Default.UseTeleportInsteadOfWalking;
 
@@ -75,9 +73,27 @@ namespace PokemonGo.RocketAPI.Console
 
         //TODO: make these configurable settings
         // Set our maximum value for all items in this group
-        private const int MaxBalls = 200;
-        private const int MaxBerries = 50;
-        private const int MaxPotions = 20;
+        public int MaxBalls
+        {
+            get
+            {
+                return 200;
+            }
+        }
+        public int MaxBerries
+        {
+            get
+            {
+                return 50;
+            }
+        }
+        public int MaxPotions
+        {
+            get
+            {
+                return 30;
+            }
+        }
 
         public Settings()
         {
@@ -124,8 +140,8 @@ namespace PokemonGo.RocketAPI.Console
                     {ItemId.ItemPinapBerry, 30},
                     */
 
-                    {ItemId.ItemRevive, 15},
-                    {ItemId.ItemMaxRevive, 25},
+                    {ItemId.ItemRevive, 0},
+                    {ItemId.ItemMaxRevive, 15},
                     {ItemId.ItemLuckyEgg, 200},
                     {ItemId.ItemIncenseOrdinary, 100},
                     {ItemId.ItemIncenseSpicy, 100},

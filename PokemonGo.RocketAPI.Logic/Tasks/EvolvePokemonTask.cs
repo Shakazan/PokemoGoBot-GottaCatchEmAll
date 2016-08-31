@@ -8,15 +8,16 @@ using PokemonGo.RocketAPI.Logic;
 using PokemonGo.RocketAPI.Logic.Utils;
 using Logger = PokemonGo.RocketAPI.Logic.Logging.Logger;
 using LogLevel = PokemonGo.RocketAPI.Logic.Logging.LogLevel;
+using System.Threading;
+using POGOProtos.Data;
 
 namespace PokemonGo.RocketAPI.Logic.Tasks
 {
     public class EvolvePokemonTask
     {
-        public static async Task Execute()
+        public static async Task Execute(IEnumerable<PokemonData> pokemonToEvolve)
         {
-            await Inventory.GetCachedInventory(true);
-            var pokemonToEvolve = await Inventory.GetPokemonToEvolve(Logic._client.Settings.PrioritizeIVOverCP, Logic._client.Settings.PokemonsToEvolve);
+
             if (pokemonToEvolve == null || !pokemonToEvolve.Any())
                 return;
 
@@ -25,7 +26,7 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
             {
                 var evolvePokemonOutProto = await Logic._client.Inventory.EvolvePokemon(pokemon.Id);
 
-                var pokemonDetails = PokemonInfo.DisplayPokemonDetails(pokemon, Logic._clientSettings.PrioritizeFactor) ;
+                var pokemonDetails = PokemonInfo.DisplayPokemonDetails(pokemon, Logic._clientSettings.PrioritizeFactor);
 
                 await Inventory.GetCachedInventory(true);
 
@@ -36,9 +37,13 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
 
                 if (evolvePokemonOutProto.Result == EvolvePokemonResponse.Types.Result.Success)
                     BotStats.ExperienceThisSession += evolvePokemonOutProto.ExperienceAwarded;
+
+                // Thread.Sleep(30000); // 30 seconds to evolve!
+                ThreadSleep.f_sleep(40);
             }
             await BotStats.GetPokeDexCount();
-            BotStats.UpdateConsoleTitle();
+            Logger.UpdateTitle(BotStats.ConsoleTitle());
+
         }
 
     }

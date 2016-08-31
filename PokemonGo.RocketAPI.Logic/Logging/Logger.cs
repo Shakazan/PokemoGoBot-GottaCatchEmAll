@@ -1,8 +1,10 @@
 ﻿#region
 
-using PokemonGo.RocketAPI.Window;
+using GMap.NET;
+using POGOProtos.Data;
+using POGOProtos.Map.Fort;
 using System;
-using System.Diagnostics.Eventing.Reader;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -11,6 +13,154 @@ using System.Text;
 
 namespace PokemonGo.RocketAPI.Logic.Logging
 {
+    public delegate void MessageEventHandler(object sender, MessageEventArgs a);
+
+    public class LogicEvents
+    {
+
+        // Declare the event using EventHandler<T>
+        public event EventHandler<MessageEventArgs> RaiseMessageEvent;
+        public event EventHandler<MessageEventArgs> UpdateTitleEvent;
+        public event EventHandler<PokemonDataCollectionEventArgs> EvolvePokemonsEvent;
+        public event EventHandler<FortDataCollectionEventArgs> FortsChangedEvent;
+        public event EventHandler<PointLatLngEventArgs> PlayerPositionChangedEvent;
+
+        public void WriteMessage(string message)
+        {
+            // Write some code that does something useful here
+            // then raise the event. You can also raise an event
+            // before you execute a block of code.
+            OnRaiseMessageEvent(new MessageEventArgs(message));
+
+        }
+
+        public void RaiseUpdateTitleEvent(string message)
+        {
+            // Write some code that does something useful here
+            // then raise the event. You can also raise an event
+            // before you execute a block of code.
+            OnUpdateTitleEvent(new MessageEventArgs(message));
+
+        }
+        // Wrap event invocations inside a protected virtual method
+        // to allow derived classes to override the event invocation behavior
+        protected virtual void OnRaiseMessageEvent(MessageEventArgs e)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            EventHandler<MessageEventArgs> handler = RaiseMessageEvent;
+
+            // Event will be null if there are no subscribers
+            if (handler != null)
+            {
+                // Format the string to send inside the CustomEventArgs parameter
+                // e.Message += String.Format(" at {0}", DateTime.Now.ToString());
+
+                // Use the () operator to raise the event.
+                handler(this, e);
+            }
+        }
+
+        // Wrap event invocations inside a protected virtual method
+        // to allow derived classes to override the event invocation behavior
+        protected virtual void OnUpdateTitleEvent(MessageEventArgs e)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            EventHandler<MessageEventArgs> handler = UpdateTitleEvent;
+
+            // Event will be null if there are no subscribers
+            if (handler != null)
+            {
+                // Format the string to send inside the CustomEventArgs parameter
+                e.Message += String.Format(" at {0}", DateTime.Now.ToString());
+
+                // Use the () operator to raise the event.
+                handler(this, e);
+            }
+        }
+
+        public void RaiseEvolvePokemonEvent(IEnumerable<PokemonData> pokemonList)
+        {
+            // Write some code that does something useful here
+            // then raise the event. You can also raise an event
+            // before you execute a block of code.
+            OnEvolvePokemonEvent(new PokemonDataCollectionEventArgs(pokemonList));
+
+        }
+        // Wrap event invocations inside a protected virtual method
+        // to allow derived classes to override the event invocation behavior
+        protected virtual void OnEvolvePokemonEvent(PokemonDataCollectionEventArgs e)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            EventHandler<PokemonDataCollectionEventArgs> handler = EvolvePokemonsEvent;
+
+            // Event will be null if there are no subscribers
+            if (handler != null)
+            {
+                // Use the () operator to raise the event.
+                handler(this, e);
+            }
+        }
+
+
+
+        public void RaiseFortsChangedEvent(IEnumerable<FortData> FortList)
+        {
+            // Write some code that does something useful here
+            // then raise the event. You can also raise an event
+            // before you execute a block of code.
+            OnFortsChangedEvent(new FortDataCollectionEventArgs(FortList));
+
+        }
+        // Wrap event invocations inside a protected virtual method
+        // to allow derived classes to override the event invocation behavior
+        protected virtual void OnFortsChangedEvent(FortDataCollectionEventArgs e)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            EventHandler<FortDataCollectionEventArgs> handler = FortsChangedEvent;
+
+            // Event will be null if there are no subscribers
+            if (handler != null)
+            {
+                // Use the () operator to raise the event.
+                handler(this, e);
+            }
+        }
+
+
+        public void RaisePlayerPositionChangedEvent(PointLatLng newPosition)
+        {
+            // Write some code that does something useful here
+            // then raise the event. You can also raise an event
+            // before you execute a block of code.
+            OnPlayerPositionChangedEvent(new PointLatLngEventArgs(newPosition));
+
+        }
+        // Wrap event invocations inside a protected virtual method
+        // to allow derived classes to override the event invocation behavior
+        protected virtual void OnPlayerPositionChangedEvent(PointLatLngEventArgs e)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            EventHandler<PointLatLngEventArgs> handler = PlayerPositionChangedEvent;
+
+            // Event will be null if there are no subscribers
+            if (handler != null)
+            {
+                // Use the () operator to raise the event.
+                handler(this, e);
+            }
+        }
+
+    }
     /// <summary>
     /// Generic logger which can be used across the projects.
     /// Logger should be set to properly log.
@@ -20,12 +170,12 @@ namespace PokemonGo.RocketAPI.Logic.Logging
         private static string _currentFile = string.Empty;
         private static readonly string Path = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Logs");
         //private static Logger _logger;
-        private static StatusWindow _statusForm;
+        public static LogicEvents Events =  new LogicEvents();
 
         /// <summary>
         /// Set the logger. All future requests to <see cref="Write(string,LogLevel,ConsoleColor)"/> will use that logger, any old will be unset.
         /// </summary>
-        public static void SetLogger(StatusWindow statusForm)
+        public static void SetLogger()
         {
             if (!Directory.Exists(Path))
             {
@@ -33,7 +183,6 @@ namespace PokemonGo.RocketAPI.Logic.Logging
             }
             _currentFile = DateTime.Now.ToString("yyyy-MM-dd - HH.mm.ss");
             Log($"Initializing Rocket logger @ {DateTime.Now}...");
-            _statusForm = statusForm;
         }
 
         /// <summary>
@@ -46,8 +195,9 @@ namespace PokemonGo.RocketAPI.Logic.Logging
         {
             Console.OutputEncoding = Encoding.Unicode;
 
-            _statusForm.LabelStatusValue = message;
-
+            string outputMessage = "";
+                       
+            
             var dateFormat = DateTime.Now.ToString("HH:mm:ss");
             if (Logic._client != null && Logic._client.Settings.DebugMode)
                 dateFormat = DateTime.Now.ToString("HH:mm:ss:fff");
@@ -55,89 +205,69 @@ namespace PokemonGo.RocketAPI.Logic.Logging
             switch (level)
             {
                 case LogLevel.Info:
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.WriteLine($"[{dateFormat}] (INFO) {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] (INFO) {message}");
                     break;
                 case LogLevel.Warning:
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.WriteLine($"[{dateFormat}] (ATTENTION) {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] (ATTENTION) {message}");
                     break;
                 case LogLevel.Error:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"[{dateFormat}] (ERROR) {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] (ERROR) {message}");
                     break;
                 case LogLevel.Debug:
                     if (Logic._client.Settings.DebugMode)
                     {
-                        Console.ForegroundColor = ConsoleColor.Gray;
-                        Console.WriteLine($"[{dateFormat}] (DEBUG) {message}");
-                        Log(string.Concat($"[{dateFormat}] ", message));
+                        outputMessage = ($"[{dateFormat}] (DEBUG) {message}");
                     }
                     break;
                 case LogLevel.Navigation:
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.WriteLine($"[{dateFormat}] (NAVIGATION) {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] (NAVIGATION) {message}");
                     break;
                 case LogLevel.Pokestop:
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"[{dateFormat}] (POKESTOP) {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] (POKESTOP) {message}");
                     break;
                 case LogLevel.Pokemon:
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"[{dateFormat}] (PKMN) {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] (PKMN) {message}");
                     break;
                 case LogLevel.Transfer:
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine($"[{dateFormat}] (TRANSFER) {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] (TRANSFER) {message}");
                     break;
                 case LogLevel.Evolve:
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine($"[{dateFormat}] (EVOLVE) {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] (EVOLVE) {message}");
                     break;
                 case LogLevel.Berry:
-                    Console.ForegroundColor = ConsoleColor.Magenta;
-                    Console.WriteLine($"[{dateFormat}] (BERRY) {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] (BERRY) {message}");
                     break;
                 case LogLevel.Egg:
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine($"[{dateFormat}] (EGG) {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] (EGG) {message}");
                     break;
                 case LogLevel.Incense:
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine($"[{dateFormat}] (INSENCE) {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] (INCENSE) {message}");
                     break;
                 case LogLevel.Recycling:
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine($"[{dateFormat}] (RECYCLING) {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] (RECYCLING) {message}");
                     break;
                 case LogLevel.Incubation:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"[{dateFormat}] (INCUBATION) {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] (INCUBATION) {message}");
                     break;
                 case LogLevel.None:
-                    Console.ForegroundColor = color;
-                    Console.WriteLine($"[{dateFormat}] {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] {message}");
                     break;
                 default:
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine($"[{dateFormat}] {message}");
-                    Log(string.Concat($"[{dateFormat}] ", message));
+                    outputMessage = ($"[{dateFormat}] {message}");
                     break;
             }
+
+            if (outputMessage.Length > 0)
+            {
+                Log(outputMessage);
+                Events.WriteMessage(outputMessage);
+            }
+
+        }
+
+        public static void UpdateTitle(string message)
+        {
+            Events.RaiseUpdateTitleEvent(message);
         }
 
         private static void Log(string message)

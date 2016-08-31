@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using PokemonGo.RocketAPI.Logic.Utils;
 using Logger = PokemonGo.RocketAPI.Logic.Logging.Logger;
 using LogLevel = PokemonGo.RocketAPI.Logic.Logging.LogLevel;
+using System.Threading;
 
 namespace PokemonGo.RocketAPI.Logic.Tasks
 {
@@ -39,11 +40,14 @@ namespace PokemonGo.RocketAPI.Logic.Tasks
                 var bestCPPokemon = await Inventory.GetHighestPokemonOfTypeByCp(pokemon);
                 var bestPokemonInfo = $"Best Rank: {PokemonInfo.DisplayPokemonDetails(bestRankingPokemon, Logic._clientSettings.PrioritizeFactor)} |\r\n BestCP: {PokemonInfo.DisplayPokemonDetails(bestCPPokemon, Logic._clientSettings.PrioritizeFactor)} |\r\n Best IV: {PokemonInfo.DisplayPokemonDetails(bestIVPokemon, Logic._clientSettings.PrioritizeFactor)}";
 
-                Logger.Write($"{pokemon.PokemonId} {PokemonInfo.DisplayPokemonDetails(pokemon, Logic._clientSettings.PrioritizeFactor)} |\r\n {bestPokemonInfo} |\r\n Family Candies: {familyCandies}", LogLevel.Transfer);
+                Logger.Write($"\n {pokemon.PokemonId} {PokemonInfo.DisplayPokemonDetails(pokemon, Logic._clientSettings.PrioritizeFactor)} |\r\n {bestPokemonInfo} |\r\n Family Candies: {familyCandies}", LogLevel.Transfer);
+
+                // Thread.Sleep(5000);
+                ThreadSleep.f_sleep(5);
             }
 
             await BotStats.GetPokemonCount();
-            BotStats.UpdateConsoleTitle();
+            Logger.UpdateTitle(BotStats.ConsoleTitle());
         }
     }
 }

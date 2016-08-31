@@ -25,25 +25,13 @@ namespace PokemonGo.RocketAPI.Console {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("95")]
+        [global::System.Configuration.DefaultSettingValueAttribute("90")]
         public float TransferPokemonKeepAllAboveIV {
             get {
                 return ((float)(this["TransferPokemonKeepAllAboveIV"]));
             }
             set {
                 this["TransferPokemonKeepAllAboveIV"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
-        public double WalkingSpeedInKilometerPerHour {
-            get {
-                return ((double)(this["WalkingSpeedInKilometerPerHour"]));
-            }
-            set {
-                this["WalkingSpeedInKilometerPerHour"] = value;
             }
         }
         
@@ -85,7 +73,7 @@ namespace PokemonGo.RocketAPI.Console {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\sparsloe\\Downloads\\Southfields To Westminster.gpx")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\sparsloe\\Downloads\\GreenPark2b.gpx")]
         public string GPXFile {
             get {
                 return ((string)(this["GPXFile"]));
@@ -97,7 +85,7 @@ namespace PokemonGo.RocketAPI.Console {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool NotTransferPokemonsThatCanEvolve {
             get {
                 return ((bool)(this["NotTransferPokemonsThatCanEvolve"]));
@@ -121,7 +109,7 @@ namespace PokemonGo.RocketAPI.Console {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool EvolvePokemon {
             get {
                 return ((bool)(this["EvolvePokemon"]));
@@ -337,7 +325,7 @@ namespace PokemonGo.RocketAPI.Console {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1800")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1500")]
         public int TransferPokemonKeepAllAboveCP {
             get {
                 return ((int)(this["TransferPokemonKeepAllAboveCP"]));
@@ -349,7 +337,7 @@ namespace PokemonGo.RocketAPI.Console {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("51.51562")]
+        [global::System.Configuration.DefaultSettingValueAttribute("51.504836")]
         public double DefaultLatitude {
             get {
                 return ((double)(this["DefaultLatitude"]));
@@ -361,7 +349,7 @@ namespace PokemonGo.RocketAPI.Console {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-0.117373")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-0.142159")]
         public double DefaultLongitude {
             get {
                 return ((double)(this["DefaultLongitude"]));
@@ -385,7 +373,7 @@ namespace PokemonGo.RocketAPI.Console {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Tahkalak")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Takalak01")]
         public string PtcUsername {
             get {
                 return ((string)(this["PtcUsername"]));
@@ -409,7 +397,7 @@ namespace PokemonGo.RocketAPI.Console {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1500")]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
         public int MaxTravelDistanceInMeters {
             get {
                 return ((int)(this["MaxTravelDistanceInMeters"]));
@@ -445,7 +433,7 @@ namespace PokemonGo.RocketAPI.Console {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("shaunparsloe@gmail.com")]
+        [global::System.Configuration.DefaultSettingValueAttribute("karenandshaun2014@gmail.com")]
         public string GoogleEmail {
             get {
                 return ((string)(this["GoogleEmail"]));
@@ -457,7 +445,7 @@ namespace PokemonGo.RocketAPI.Console {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("rkhfxtklvtomxeub")]
+        [global::System.Configuration.DefaultSettingValueAttribute("mambo001")]
         public string GooglePassword {
             get {
                 return ((string)(this["GooglePassword"]));
